@@ -11,14 +11,16 @@ import Product from "./pages/product/Product";
 import NewProduct from "./pages/newProduct/NewProduct";
 import Login from "./pages/login/login";
 
-
 function App() {
   return (
     <Router>
+        <Switch>
+      <Route path="/login">
+        <Login />
+      </Route>
       <Topbar />
       <div className="container">
         <Sidebar />
-        <Switch>
           <Route exact path="/">
             <Home />
           </Route>
@@ -40,11 +42,8 @@ function App() {
           <Route path="/newproduct">
             <NewProduct />
           </Route>
-          <Route path="/login">
-            <Login />
-          </Route>
-        </Switch>
       </div>
+        </Switch>
     </Router>
   );
 }
