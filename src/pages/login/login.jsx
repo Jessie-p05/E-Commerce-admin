@@ -1,19 +1,31 @@
-import { useState } from "react"
+import { useState } from "react";
+import { useDispatch } from "react-redux";
+import { login } from "../../redux/apiCalls";
 
 const Login = () => {
-  const [username,setUsername] = useState("")
-  const [password,setpassword] = useState("")
+  const [username, setUsername] = useState("");
+  const [password, setpassword] = useState("");
+  const dispatch = useDispatch();
 
-  const handleClick = ()=> {
+  const handleClick = (e) => {
     e.preventDefault();
-  }
-  return(
+    login(dispatch, { username, password })
+  };
+  return (
     <div>
-      <input type="text" placeholder="username" onChange={e=>setUsername(e.target.value)}/>
-      <input type="password" placeholder="password" onChange={e=>setUsername(e.target.value)}/>
+      <input
+        type="text"
+        placeholder="username"
+        onChange={(e) => setUsername(e.target.value)}
+      />
+      <input
+        type="password"
+        placeholder="password"
+        onChange={(e) => setpassword(e.target.value)}
+      />
       <button onClick={handleClick}>Login</button>
     </div>
-  )
-}
+  );
+};
 
-export default Login
+export default Login;
