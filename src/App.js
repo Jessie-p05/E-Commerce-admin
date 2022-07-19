@@ -22,7 +22,7 @@ function App() {
   const loginUser = useSelector((state) => state.user.currentUser);
   let admin;
   if (loginUser) {
-    admin = useSelector((state) => state.user.currentUser.isAdmin);
+    admin = loginUser.isAdmin;
   }
   let location = useLocation();
   // const user = useSelector((state) => state.user.currentUser);
