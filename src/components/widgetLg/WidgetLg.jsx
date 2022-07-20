@@ -1,11 +1,13 @@
 import { useEffect, useState } from "react";
 import { userRequest } from "../../requestMethods";
 import "./widgetLg.css";
-
+import {format} from "timeago.js";
+ 
 export default function WidgetLg() {
   const Button = ({ type }) => {
     return <button className={"widgetLgButton " + type}>{type}</button>;
   };
+
   const [orders, setOrders] = useState([]);
   useEffect(() => {
     const getOrders = async () => {
@@ -38,9 +40,9 @@ export default function WidgetLg() {
                   alt=""
                   className="widgetLgImg"
                 />
-                <span className="widgetLgName">{order.userId}</span>
+                <span className="widgetLgName">{order.user.username}</span>
               </td>
-              <td className="widgetLgDate">{order.createdAt}</td>
+              <td className="widgetLgDate">{format(order.createdAt)}</td>
               <td className="widgetLgAmount">{order.amount}</td>
               <td className="widgetLgStatus">
                 <Button type="Approved" />
