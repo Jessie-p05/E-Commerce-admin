@@ -1,5 +1,6 @@
 import {configureStore} from "@reduxjs/toolkit";
 import userReducer from "./userRedux";
+import productReducer from "./productRedux";
 import storage from 'redux-persist/lib/storage';
 import { combineReducers } from 'redux';
 import {
@@ -17,7 +18,18 @@ const persistConfig = {
   storage,
 }
 
-const rootReducer = combineReducers({user:userReducer});
+const appReducer = combineReducers({user:userReducer,product:productReducer});
+
+const rootReducer = (state, action) => {
+  if (action.type === 'SIGNOUT_REQUEST') {
+      // for all keys defined in your persistConfig(s)
+      storage.removeItem('persist:root')
+      // storage.removeItem('persist:otherKey')
+
+      return appReducer(undefined, action);
+  }
+  return appReducer(state, action);
+};
 
 
 const persistedReducer = persistReducer(persistConfig, rootReducer)
