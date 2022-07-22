@@ -21,6 +21,19 @@ const productSlice = createSlice({
       state.error = true;
       state.isFethching = false;
     },
+    //delete one product
+    deleteProductStart: (state) => {
+      state.isFethching = true;
+      state.error = false;
+    },
+    deleteProductSuccess: (state, action) => {
+      state.isFethching = false;
+      state.products.splice(state.products.findIndex((item)=>item._id===action.payload),1);
+    },
+    deleteProductFailure: (state) => {
+      state.error = true;
+      state.isFethching = false;
+    },
   },
 });
 
@@ -28,5 +41,8 @@ export const {
   getProductStart,
   getProductFailure,
   getProductSuccess,
+  deleteProductStart,
+  deleteProductFailure,
+  deleteProductSuccess,
 } = productSlice.actions;
 export default productSlice.reducer;
