@@ -1,18 +1,52 @@
-import { Link } from "react-router-dom";
+import { Link, useLocation } from "react-router-dom";
 import "./product.css";
 import Chart from "../../components/chart/Chart";
-// import {productData} from "../../dummyData"
+import { productData } from "../../dummyData";
 import { Publish } from "@material-ui/icons";
 import { useSelector } from "react-redux";
-import { useLocation } from "react-router-dom";
+import { useState, useEffect, useMemo } from "react";
+import { userRequest } from "../../requestMethods";
 
 export default function Product() {
+  const [stats, setStats] = useState([]);
   const products = useSelector((state) => state.product.products);
   const location = useLocation();
   const product = products.find(
     (product) => product._id === location.pathname.slice(9)
   );
-  
+  console.log(product)
+  const MONTHS = useMemo(() => [
+    "Jan",
+    "Feb",
+    "Mar",
+    "Apr",
+    "May",
+    "Jun",
+    "Jul",
+    "Agu",
+    "Sep",
+    "Oct",
+    "Nov",
+    "Dec",
+  ]);
+  useEffect(() => {
+    const getStats = async () => {
+      try {
+        const res = await userRequest.get("/orders/income?pid="+ product._id);
+        const list = res.data.sort((a, b) => {
+          return a._id - b._id;
+        });
+        console.log(list)
+        list.map((item) =>
+          setStats((prev) => [
+            ...prev,
+            { name: MONTHS[item._id - 1], Sales: item.total },
+          ])
+        );
+      } catch {}
+    };
+    getStats();
+  }, []);
 
   return (
     <div className="product">
@@ -24,7 +58,7 @@ export default function Product() {
       </div>
       <div className="productTop">
         <div className="productTopLeft">
-          <Chart data={productData} dataKey="Sales" title="Sales Performance" />
+          <Chart data={stats} dataKey="Sales" title="Sales Performance" />
         </div>
         <div className="productTopRight">
           <div className="productInfoTop">
@@ -41,14 +75,10 @@ export default function Product() {
               <span className="productInfoValue">5123</span>
             </div>
             <div className="productInfoItem">
-              <span className="productInfoKey">active:</span>
+              <span className="productInfoKey">in stock:</span>
               <span className="productInfoValue">
                 {product.instock ? "yes" : "no"}
               </span>
-            </div>
-            <div className="productInfoItem">
-              <span className="productInfoKey">in stock:</span>
-              <span className="productInfoValue">{product.instock ? "yes" : "no"}</span>
             </div>
           </div>
         </div>
@@ -57,16 +87,15 @@ export default function Product() {
         <form className="productForm">
           <div className="productFormLeft">
             <label>Product Name</label>
-            <input type="text" placeholder="Apple AirPod" />
+            <input type="text" placeholder={product.title} />
+            <label>Product Description</label>
+            <input type="text" placeholder={product.desc} />
+            <label>Product Price</label>
+            <input type="text" placeholder={product.price} />
             <label>In Stock</label>
             <select name="inStock" id="idStock">
-              <option value="yes">Yes</option>
-              <option value="no">No</option>
-            </select>
-            <label>Active</label>
-            <select name="active" id="active">
-              <option value="yes">Yes</option>
-              <option value="no">No</option>
+              <option value="true">Yes</option>
+              <option value="false">No</option>
             </select>
           </div>
           <div className="productFormRight">
