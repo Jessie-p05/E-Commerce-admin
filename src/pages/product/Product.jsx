@@ -3,9 +3,10 @@ import "./product.css";
 import Chart from "../../components/chart/Chart";
 import { productData } from "../../dummyData";
 import { Publish } from "@material-ui/icons";
-import { useSelector } from "react-redux";
+import { useDispatch, useSelector } from "react-redux";
 import { useState, useEffect, useMemo } from "react";
 import { userRequest } from "../../requestMethods";
+import { updateProduct } from "../../redux/apiCalls";
 
 export default function Product() {
   const [stats, setStats] = useState([]);
@@ -13,8 +14,14 @@ export default function Product() {
   const location = useLocation();
   const product = products.find(
     (product) => product._id === location.pathname.slice(9)
-  );
-  console.log(product)
+    );
+
+    const [pName, setpName] = useState(product.name);
+    const [pDesc, setPDesc] = useState(product.desc);
+    const [pPrice, setPPrice] = useState(product.price);
+    const [pStock, setPStock] = useState(product.stock);
+    const [pImg, setPImg] = useState(product.img);
+
   const MONTHS = useMemo(() => [
     "Jan",
     "Feb",
@@ -36,7 +43,6 @@ export default function Product() {
         const list = res.data.sort((a, b) => {
           return a._id - b._id;
         });
-        console.log(list)
         list.map((item) =>
           setStats((prev) => [
             ...prev,
@@ -47,6 +53,13 @@ export default function Product() {
     };
     getStats();
   }, []);
+
+  const dispatch = useDispatch();
+  const handleClick = (e) => {
+    e.preventDefault();
+    const productToUpdate= {...product, title:pName, desc:pDesc,price:pPrice,instock:pStock, img:pImg}
+    updateProduct(dispatch, productToUpdate);
+  };
 
   return (
     <div className="product">
@@ -87,13 +100,13 @@ export default function Product() {
         <form className="productForm">
           <div className="productFormLeft">
             <label>Product Name</label>
-            <input type="text" placeholder={product.title} />
+            <input type="text" placeholder={product.title} onChange={(e) => setpName(e.target.value)}/>
             <label>Product Description</label>
-            <input type="text" placeholder={product.desc} />
+            <input type="text" placeholder={product.desc} onChange={(e) => setPDesc(e.target.value)}/>
             <label>Product Price</label>
-            <input type="text" placeholder={product.price} />
+            <input type="text" placeholder={product.price} onChange={(e) => setPPrice(e.target.value)}/>
             <label>In Stock</label>
-            <select name="inStock" id="idStock">
+            <select name="inStock" id="idStock" onChange={(e) => setPStock(e.target.value)}>
               <option value="true">Yes</option>
               <option value="false">No</option>
             </select>
@@ -104,9 +117,9 @@ export default function Product() {
               <label for="file">
                 <Publish />
               </label>
-              <input type="file" id="file" style={{ display: "none" }} />
+              <input type="file" id="file" style={{ display: "none" }} onChange={(e) => setPImg(e.target.value)}/>
             </div>
-            <button className="productButton">Update</button>
+            <button className="productButton" onClick={handleClick}>Update</button>
           </div>
         </form>
       </div>

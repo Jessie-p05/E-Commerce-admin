@@ -1,3 +1,4 @@
+import { gridColumnLookupSelector } from "@material-ui/data-grid";
 import { createSlice } from "@reduxjs/toolkit";
 
 const productSlice = createSlice({
@@ -34,6 +35,21 @@ const productSlice = createSlice({
       state.error = true;
       state.isFethching = false;
     },
+    //update one product
+    updateProductStart: (state) => {
+      state.isFethching = true;
+      state.error = false;
+    },
+    updateProductSuccess: (state, action) => {
+      state.isFethching = false;
+      const index = state.products.findIndex((item)=>item._id===action.payload._id);
+      console.log(action.payload);
+      state.products[index] = action.payload;
+    },
+    updateProductFailure: (state) => {
+      state.error = true;
+      state.isFethching = false;
+    },
   },
 });
 
@@ -44,5 +60,8 @@ export const {
   deleteProductStart,
   deleteProductFailure,
   deleteProductSuccess,
+  updateProductStart,
+  updateProductFailure,
+  updateProductSuccess,
 } = productSlice.actions;
 export default productSlice.reducer;
