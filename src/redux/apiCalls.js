@@ -1,6 +1,6 @@
 import { publicRequest,userRequest } from "../requestMethods";
 import { loginFailure, loginStart, loginSuccess } from "./userRedux";
-import { getProductFailure, getProductStart, getProductSuccess ,deleteProductFailure, deleteProductStart, deleteProductSuccess,updateProductFailure, updateProductStart, updateProductSuccess} from "./productRedux";
+import { getProductFailure, getProductStart, getProductSuccess ,deleteProductFailure, deleteProductStart, deleteProductSuccess,updateProductFailure, updateProductStart, updateProductSuccess,addProductFailure, addProductStart, addProductSuccess} from "./productRedux";
 
 export const login = async (dispatch, user) => {
   dispatch(loginStart(user));
@@ -42,10 +42,21 @@ export const updateProduct = async (dispatch,product) => {
 
   try {
     const res = await userRequest.put(`/products/${product._id}`,product);
-    console.log("res.data",res.data)
     dispatch(updateProductSuccess(res.data));
   } catch (err) {
     dispatch(updateProductFailure());
+  }
+};
+
+export const addProduct = async (dispatch,product) => {
+  dispatch(addProductStart());
+
+  try {
+    const res = await userRequest.post(`/products/`,product);
+    console.log("res.data",res.data)
+    dispatch(addProductSuccess(res.data));
+  } catch (err) {
+    dispatch(addProductFailure());
   }
 };
 
