@@ -1,12 +1,13 @@
 import { Link, useLocation } from "react-router-dom";
 import "./product.css";
 import Chart from "../../components/chart/Chart";
-import { productData } from "../../dummyData";
 import { Publish } from "@material-ui/icons";
 import { useDispatch, useSelector } from "react-redux";
 import { useState, useEffect, useMemo } from "react";
 import { userRequest } from "../../requestMethods";
 import { updateProduct } from "../../redux/apiCalls";
+import { storage } from '../../firebase';
+import { ref, getDownloadURL, uploadBytesResumable } from "firebase/storage";
 
 export default function Product() {
   const [stats, setStats] = useState([]);
@@ -16,11 +17,15 @@ export default function Product() {
     (product) => product._id === location.pathname.slice(9)
     );
 
-    const [pName, setpName] = useState(product.name);
+    const [pName, setPName] = useState(product.title);
     const [pDesc, setPDesc] = useState(product.desc);
     const [pPrice, setPPrice] = useState(product.price);
-    const [pStock, setPStock] = useState(product.stock);
+    const [pStock, setPStock] = useState(product.instock);
     const [pImg, setPImg] = useState(product.img);
+    const [imgUrl, setImgUrl] = useState(null);
+    const [progresspercent, setProgresspercent] = useState(0);
+
+
 
   const MONTHS = useMemo(() => [
     "Jan",
@@ -36,6 +41,7 @@ export default function Product() {
     "Nov",
     "Dec",
   ]);
+
   useEffect(() => {
     const getStats = async () => {
       try {
@@ -55,11 +61,39 @@ export default function Product() {
   }, []);
 
   const dispatch = useDispatch();
+
   const handleClick = (e) => {
     e.preventDefault();
     const productToUpdate= {...product, title:pName, desc:pDesc,price:pPrice,instock:pStock, img:pImg}
     updateProduct(dispatch, productToUpdate);
   };
+
+  const handleImgSubmit = (e) => {
+    // e.preventDefault()
+    // console.log("hiiiiii",e.target.files[0])
+    const file = e.target.files[0];
+
+    if (!file) return;
+
+    const storageRef = ref(storage, `files/${file.name}`);
+    const uploadTask = uploadBytesResumable(storageRef, file);
+
+    uploadTask.on("state_changed",
+      (snapshot) => {
+        const progress =
+          Math.round((snapshot.bytesTransferred / snapshot.totalBytes) * 100);
+        setProgresspercent(progress);
+      },
+      (error) => {
+        alert(error);
+      },
+      () => {
+        getDownloadURL(uploadTask.snapshot.ref).then((downloadURL) => {
+          setPImg(downloadURL)
+        });
+      }
+    );
+  }
 
   return (
     <div className="product">
@@ -100,11 +134,11 @@ export default function Product() {
         <form className="productForm">
           <div className="productFormLeft">
             <label>Product Name</label>
-            <input type="text" placeholder={product.title} onChange={(e) => setpName(e.target.value)}/>
+            <input type="text" placeholder={product.title} onChange={(e) => setPName(e.target.value)}/>
             <label>Product Description</label>
             <input type="text" placeholder={product.desc} onChange={(e) => setPDesc(e.target.value)}/>
             <label>Product Price</label>
-            <input type="text" placeholder={product.price} onChange={(e) => setPPrice(e.target.value)}/>
+            <input type="number" placeholder={product.price} onChange={(e) => setPPrice(e.target.value)}/>
             <label>In Stock</label>
             <select name="inStock" id="idStock" onChange={(e) => setPStock(e.target.value)}>
               <option value="true">Yes</option>
@@ -117,7 +151,7 @@ export default function Product() {
               <label for="file">
                 <Publish />
               </label>
-              <input type="file" id="file" style={{ display: "none" }} onChange={(e) => setPImg(e.target.value)}/>
+              <input type="file" id="file" style={{ display: "none" }} onChange={handleImgSubmit}/>
             </div>
             <button className="productButton" onClick={handleClick}>Update</button>
           </div>
