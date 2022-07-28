@@ -22,7 +22,6 @@ export default function Product() {
     const [pPrice, setPPrice] = useState(product.price);
     const [pStock, setPStock] = useState(product.instock);
     const [pImg, setPImg] = useState(product.img);
-    const [imgUrl, setImgUrl] = useState(null);
     const [progresspercent, setProgresspercent] = useState(0);
 
 
@@ -69,8 +68,6 @@ export default function Product() {
   };
 
   const handleImgSubmit = (e) => {
-    // e.preventDefault()
-    // console.log("hiiiiii",e.target.files[0])
     const file = e.target.files[0];
 
     if (!file) return;
