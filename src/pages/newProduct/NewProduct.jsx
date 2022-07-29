@@ -8,17 +8,24 @@ import { ref, getDownloadURL, uploadBytesResumable } from "firebase/storage";
 export default function NewProduct() {
   const [pName, setPName] = useState("");
   const [pDesc, setPDesc] = useState("");
+  const [pCat, setPCat] = useState([]);
   const [pPrice, setPPrice] = useState(0);
   const [pStock, setPStock] = useState(true);
   const [pImg, setPImg] = useState("");
   const [progresspercent, setProgresspercent] = useState(0);
 
   const dispatch = useDispatch();
+
   const handleClick = (e) => {
     e.preventDefault();
-    const productToAdd= { title:pName, desc:pDesc,price:pPrice,instock:pStock, img:pImg}
+    const productToAdd= { title:pName, category:pCat, desc:pDesc,price:pPrice,instock:pStock, img:pImg}
     addProduct(dispatch, productToAdd);
   };
+
+  const handleCat = (e) => {
+   setPCat(e.target.value.split(","))
+  }
+
   const handleImgSubmit = (e) => {
     const file = e.target.files[0];
 
@@ -78,6 +85,14 @@ export default function NewProduct() {
             type="text"
             placeholder=""
             onChange={(e) => setPDesc(e.target.value)}
+          />
+        </div>
+        <div className="addProductItem">
+          <label>Category</label>
+          <input
+            type="text"
+            placeholder=""
+            onChange={handleCat}
           />
         </div>
         <div className="addProductItem">
